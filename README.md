@@ -1,63 +1,33 @@
 # Percolation
 
-A **Union-Find** based percolation model in Java with Monte Carlo simulation to estimate the **percolation threshold** of an N×N grid.
+Estimating the **percolation threshold** of an n×n grid with a **Monte Carlo simulation**, comparing a
+brute-force model with a **union-find** model. Written in Java for a data structures and algorithms course.
 
-## Problem
+## The problem
 
-An N×N grid of sites is either *blocked* or *open*. The system **percolates** when there is a path of open sites from the top row to the bottom row — modelling physical phenomena like water flowing through porous rock or electrical conductivity through composite materials.
+Each site of an n×n grid is open or blocked. The system **percolates** if open sites connect the top row to
+the bottom row (think water draining through porous rock). If sites are opened at random, what fraction must
+be open before the system percolates? For large grids the answer is known to be close to **0.593**.
 
-**Question:** What fraction of sites must be open for the system to percolate?
+## Files (`Array Percolation/`)
 
-## Implementations
-
-| Class | Description |
+| File | Approach |
 |---|---|
-| `ArrayPercolation.java` | Brute-force O(N²) connectivity check via full-grid scan |
-| `UFPercolation.java` | Efficient O(log N) connectivity using Weighted Union-Find with path compression |
-| `PercolationStats.java` | Monte Carlo simulation — runs T independent trials to estimate threshold |
+| `ArrayPercolation.java` | Brute force: each `percolates()` / `isFull()` call flood-fills (recursive DFS) from every open site in the top row, O(n²) per call |
+| `UFPercolation.java` | Weighted quick-union with virtual top and bottom sites, plus a second union-find without the bottom site to avoid "backwash" in `isFull()`; O(log n) per operation |
+| `PercolationStats.java` | Monte Carlo experiment: runs `m` independent trials on `UFPercolation`, opening random sites until the grid percolates, and reports the mean, standard deviation and 95% confidence interval (mean ± 1.96·σ/√m) of the threshold |
 
-## Monte Carlo Simulation
+## Run
 
-```
-For each of T independent trials:
-  1. Start with all N×N sites blocked
-  2. Randomly open sites one at a time (uniform random order)
-  3. Record the fraction of open sites when the system first percolates
-Estimate threshold = mean(fractions across T trials)
-95% confidence interval = mean ± 1.96 · stddev / √T
-```
-
-## Results
-
-For large N, the percolation threshold converges to **≈ 0.593** (proven by statistical physics).
-
-```
-N = 200, T = 100 trials
-Percolation threshold: 0.5929
-95% confidence interval: [0.5912, 0.5946]
-Elapsed time: 0.42 seconds
-```
-
-## Complexity
-
-| Implementation | Open Site | Percolates? |
-|---|---|---|
-| `ArrayPercolation` | O(1) | O(N²) |
-| `UFPercolation` | O(log* N) ≈ O(1) | O(log* N) ≈ O(1) |
-
-*log\* = iterated logarithm (nearly constant with path compression)*
-
-## Technologies
-
-- **Java**
-- Weighted Union-Find with path compression and union by rank
-- Monte Carlo simulation
-
-## Build & Run
+Uses the course libraries (`stdlib`, `dsa`).
 
 ```bash
 javac ArrayPercolation.java UFPercolation.java PercolationStats.java
 
-# Run Monte Carlo simulation: grid size N, T trials
-java PercolationStats 200 100
+java PercolationStats 200 100      # n = 200, m = 100 trials → mean, stddev, confidence interval
+java UFPercolation input.txt       # open the sites listed in a file and report whether it percolates
 ```
+
+## Concepts
+
+Union-find · flood fill / depth-first search · Monte Carlo simulation · confidence intervals
